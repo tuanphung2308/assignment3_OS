@@ -29,6 +29,13 @@ clean:
 	@rm $(OBJS_DIR)/*.elf
 	@echo Removing $(ELFILE)
 
+	# @echo Removing Object Files $(wildcard $(OBJS_DIR)/*.o)
+	# @del $(OBJS_DIR)\*.o
+	# @echo Removing $(OBJS_DIR)/$(ELFILE)
+	# @del $(OBJS_DIR)\$(ELFILE)
+	# @echo Removing $(OBJS_DIR)/$(TARGET)
+	# @del $(OBJS_DIR)\$(TARGET)
+
 run:
 	@echo Mounting image to QEMU  
 	qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel $(OBJS_DIR)/myos.elf
@@ -51,7 +58,7 @@ $(OBJS_DIR)/%.o : $(SRC_KER_DIR)/%.c
 	@echo Compiling C Source File $< 
 	@$(CC_DIR)/$(CC) $(CFLAGS) -I$(INC_CMN_DIR) -I$(INC_KER_DIR) -c $< -o $@ $(CSRCFLAGS) 
 
-$(OBJS_DIR)/$(ELFILE) : $(OBJS_DIR)/boot.o $(OBJS_DIR)/kernel.o $(OBJS_DIR)/stdlib.o $(OBJS_DIR)/stdio.o $(OBJS_DIR)/uart.o
+$(OBJS_DIR)/$(ELFILE) : $(OBJS_DIR)/boot.o $(OBJS_DIR)/kernel.o $(OBJS_DIR)/stdlib.o $(OBJS_DIR)/stdio.o $(OBJS_DIR)/uart.o $(OBJS_DIR)/I2C.o
 	@echo Linking Objects Files: $^
 	@$(CC_DIR)/$(CC) -T linker.ld -o $(OBJS_DIR)/$(ELFILE) $(LFLAGS) $^ 
 	@echo Extensible Linkable Format File: $@ created 
