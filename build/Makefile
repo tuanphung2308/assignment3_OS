@@ -15,30 +15,33 @@ SRC_KER_DIR = ../source/kernel
 INC_CMN_DIR = ../include/common
 INC_KER_DIR = ../include/kernel
 OBJS_DIR = objects
-# EM_DIR = C:/Program Files/qemu
-# CC_DIR = C:/Program Files (x86)/GNU Tools ARM Embedded/8 2019-q3-update/bin
+EM_DIR = C:/Program Files/qemu
+CC_DIR = C:/Program Files (x86)/GNU Tools ARM Embedded/8 2019-q3-update/bin
 # /usr/local/Cellar/arm-none-eabi-gcc/8-2018-q4-major
 # EM_DIR = no qemu yet
-CC_DIR = /usr/local/Cellar/arm-none-eabi-gcc/8-2018-q4-major/bin
+# CC_DIR = /usr/local/Cellar/arm-none-eabi-gcc/8-2018-q4-major/bin
 all: $(TARGET)
 
 clean: 
-	@echo Removing Object Files $(wildcard $(OBJS_DIR)/*.o)
-	@rm $(OBJS_DIR)/*.o 
-	@rm $(OBJS_DIR)/*.img
-	@rm $(OBJS_DIR)/*.elf
-	@echo Removing $(ELFILE)
-
 	# @echo Removing Object Files $(wildcard $(OBJS_DIR)/*.o)
-	# @del $(OBJS_DIR)\*.o
-	# @echo Removing $(OBJS_DIR)/$(ELFILE)
-	# @del $(OBJS_DIR)\$(ELFILE)
-	# @echo Removing $(OBJS_DIR)/$(TARGET)
-	# @del $(OBJS_DIR)\$(TARGET)
+	# @rm $(OBJS_DIR)/*.o 
+	# @rm $(OBJS_DIR)/*.img
+	# @rm $(OBJS_DIR)/*.elf
+	# @echo Removing $(ELFILE)
 
-run:
-	@echo Mounting image to QEMU  
-	qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel $(OBJS_DIR)/myos.elf
+	@echo Removing Object Files $(wildcard $(OBJS_DIR)/*.o)
+	@del $(OBJS_DIR)\*.o
+	@echo Removing $(OBJS_DIR)/$(ELFILE)
+	@del $(OBJS_DIR)\$(ELFILE)
+	@echo Removing $(OBJS_DIR)/$(TARGET)
+	@del $(OBJS_DIR)\$(TARGET)
+
+# run:
+# 	@echo Mounting image to QEMU  
+# 	qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel $(OBJS_DIR)/myos.elf
+
+run: $(OBJS_DIR)/$(ELFILE)
+	@$(EM_DIR)/$(EM) $(EMFLAGS)
 
 .PHONY: clean all run
 
