@@ -52,31 +52,55 @@ typedef union I2C_flags
     uint32_t as_int;
 } I2C_flags_t;
 
-typedef union I2C_control
+typedef union I2C_slave_control
 {
     struct
     {
-        uint8_t I2C_enabled : 1; //ENABLE I2C
-        uint8_t sir_enabled : 1; //unsupported
-        uint8_t sir_low_power_mode : 1; //unsupported
-        uint8_t reserved : 4; // reserved
-        uint8_t loop_back_enabled : 1; // the modem outputs are also fed through to the modem inputs
-        uint8_t transmit_enabled : 1; //enable transmit. the UART is disabled in the middle of 
-        // transmission, it completes the current
-        // character before stopping
-        uint8_t receive_enabled : 1; // RECEIEVE enable.
-        uint8_t data_transmit_ready : 1; //unsupported
-        uint8_t request_to_send : 1; //Request to send. This bit is the 
-        //complement of the UART request to send
-        uint8_t out1 : 1; // unsupported
-        uint8_t out2 : 1; // unsupported
-        uint8_t rts_hardware_flow_control_enabled : 1; 
-        //Data is only requested when there is space in the receive FIFO for it to be received
-        uint8_t cts_hardware_flow_control_enabled : 1; //Data is only transmitted when the
-        //nUARTCTS signal is asserted
-        uint16_t padding;
+        uint8_t slave_enabled : 1; //ENABLE I2C SLAVE = 1
+        uint8_t spi_enabled : 1; //enable SPI = 1
+        uint8_t i2c_enabled : 1; //enable I2C = 1
+        uint8_t cpha : 1; //disable: 0
+        uint8_t cpol : 1; //disable: 0
+        uint8_t enstat : 1; //ENSTAT ENABLE STATUS 8bit register 
+        // 0 = Status register disabled. Implies ordinary I2C
+        // protocol.
+        // 1 = Status register enabled. When enabled the
+        // status register is transferred as a first data
+        // character on the I2C bus. Status register is
+        // transferred to the host.
+        // NOTE: The same behaviour is achieved from the
+        // Host side by using bit SLVADDR[6] of the slave
+        // address. 
+
+        uint8_t enctrl : 1; // ENCTRL ENABLE CONTROL 8bit register
+        // 0 = Control register disabled. Implies ordinary I2C protocol.
+        // 1 = Control register enabled. When enabled the
+        // control register is received as a first data
+        // character on the I2C bus.
+        // NOTE: The same behaviour is achieved from the
+        // Host side by using bit SLVADDR[6] of the slave address
+
+        uint8_t brk : 1; //BRK Break current operation:  
+        // Stop operation and clear the FIFOs. 
+
+        uint8_t txe : 1; //TXE Transmit Enable
+        //1 = Transmit mode enabled 
+
+        uint8_t rxe: 1; //RXE Receive Enable
+        //1 = Receive mode enabled 
+
+        uint8_t INV_RXF: 1; //INV-RX Inverse RX status flags
+        //set to 0
+
+        uint8_t TESTFIFO: 1; //default to 0
+
+        uint8_t HOSTCTRLEN: 1; // default to 0
+
+        uint8_t INV_TXF: 1; //default to 0
+
+        uint8_t reserved: 17; //reserved
     };
     uint32_t as_int;
-} I2C_control_t;
+} I2C_slave_control_t;
 
 #endif
