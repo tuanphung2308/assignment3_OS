@@ -1,21 +1,27 @@
-#ifndef __I2C__
-#define __I2C__
+#ifndef __I2CHEADER__
+#define __I2CHEADER__
 #include <stddef.h>
 #include <stdint.h>
 
+// #define START_READ      BSC_C_I2CEN|BSC_C_ST|BSC_C_CLEAR|BSC_C_READ
+// #define START_WRITE     BSC_C_I2CEN|BSC_C_ST
+// #define CLEAR_STATUS    BSC_S_CLKT|BSC_S_ERR|BSC_S_DONE
+
+#define BSC_FIFO_SIZE   				16
+
 enum
 {
-    I2C_MASTER_BASE    = (0x3F205000),         // I2C Base address
-    I2C_MASTER_C       = (I2C_MASTER_BASE + 0x00),    // I2C Control 
-    I2C_MASTER_S       = (I2C_MASTER_BASE + 0x04),    // I2C Status
-    I2C_MASTER_DLEN    = (I2C_MASTER_BASE + 0x08),    // I2C Data Length
-    I2C_MASTER_A       = (I2C_MASTER_BASE + 0x0c),    // I2C Slave Address 
-    I2C_MASTER_FIFO    = (I2C_MASTER_BASE + 0x10),    // I2C Data FIFO 
-    I2C_MASTER_DIV     = (I2C_MASTER_BASE + 0x14),    // I2C Clock Divider
-    I2C_MASTER_DEL     = (I2C_MASTER_BASE + 0x18),    // I2C Data Delay
-    I2C_MASTER_CLKT    = (I2C_MASTER_BASE + 0x1c),    // I2C Clock Stretch Timeout 
+    BSC0_BASE    = (0x3F205000),         // I2C Base address
+    BSC0_C       = (BSC0_BASE + 0x00),    // I2C Control 
+    BSC0_S       = (BSC0_BASE + 0x04),    // I2C Status
+    BSC0_DLEN    = (BSC0_BASE + 0x08),    // I2C Data Length
+    BSC0_A       = (BSC0_BASE + 0x0c),    // I2C Slave Address 
+    BSC0_FIFO    = (BSC0_BASE + 0x10),    // I2C Data FIFO 
+    BSC0_DIV     = (BSC0_BASE + 0x14),    // I2C Clock Divider
+    BSC0_DEL     = (BSC0_BASE + 0x18),    // I2C Data Delay
+    BSC0_CLKT    = (BSC0_BASE + 0x1c),    // I2C Clock Stretch Timeout
 
-    I2C_SLAVE_BASE = (0x7E214000), //BSC SLAVE BASE
+    I2C_SLAVE_BASE = (0x3F214000), //BSC SLAVE BASE
     I2C_SLAVE_DR = (I2C_SLAVE_BASE + 0x00), //DATA REGISTER
     I2C_SLAVE_RSR = (I2C_SLAVE_BASE + 0x04), //STATUS REGISTER AND ERROR CLEAR REGISTER
     I2C_SLAVE_SLV = (I2C_SLAVE_BASE + 0x08), // I2C slave address value 
@@ -34,42 +40,56 @@ enum
     I2C_SLAVE_DEBUG2 = (I2C_SLAVE_BASE + 0x3C), //SPI Debug Register 
 };
 
-typedef union I2C_master_control
+typedef union BSC0_CONTROL
 {
     struct
     {
         uint8_t READ : 1; // read transfer. 0 = Write Packet Transfer. 1 = Read Packet Transfer. [0]
         uint8_t reserved : 3; // reserved. [3:1]
-        uint8_t CLEAR : 0; // FIFO clear. 00 = No action. x1 = Clear FIFO. This is 2bits. [5:4]
+        uint8_t CLEAR : 2; // FIFO clear. 00 = No action. x1 = Clear FIFO. This is 2bits. [5:4]
+        // CLEAR should be 2 bits
+
         uint8_t reserved : 1; // reserved. [6]
         uint8_t ST : 1; // start transfer. 0 = No action. 1 = Start a new transfer. [7]
-        uint8_t INTD : 0; // 0 = Don t generate interrupts on DONE. 1 = Generate interrupt while DONE =1. [8]
-        uint8_t INTT : 0; // 0 = Don t generate interrupts on TXW condition. 1 = Generate interrupt while TXW = 1. [9] 
-        uint8_t INTR : 0; // 0 = Don t generate interrupts on RXR condition. 1 = Generate interrupt while RXR = 1. [10]
+        uint8_t INTD : 1; // 0 = Don t generate interrupts on DONE. 1 = Generate interrupt while DONE =1. [8]
+        // should be 1 bit here
+        uint8_t INTT : 1; // 0 = Don t generate interrupts on TXW condition. 1 = Generate interrupt while TXW = 1. [9] 
+        // should be 1 bit here
+        uint8_t INTR : 1; // 0 = Don t generate interrupts on RXR condition. 1 = Generate interrupt while RXR = 1. [10]
+        // 1 bit length here
         uint8_t reserved : 4; // reserved. [14:11]
         uint8_t I2CEN : 1; // I2C enable. 0 = BSC controller is disabled, 1 = BSC controller is enabled. [15] 
-        uint16_t padding; // [31:16]
+        uint16_t padding: 16; // [31:16] // reserved again
     };
     uint32_t as_int;
-} I2C_master_control_t;
+} bsc0_control_t;
 
-typedef union I2C_master_flags
-{
-    struct
-    {
-        uint8_t clear_to_send : 1; // This bit is the complement of the UART clear to send
-        uint8_t data_set_ready : 1; // uns
-        uint8_t data_carrier_detected : 1;  //uns
-        uint8_t busy : 1; //busy transmitting data 
-        uint8_t receive_queue_empty : 1; // set wen rx queue empty
-        uint8_t transmit_queue_full : 1; // set wen trans queue empty
-        uint8_t receive_queue_full : 1; // set wen receieve queue full
-        uint8_t transmit_queue_empty : 1; // set wen transmit queue full
-        uint8_t ring_indicator : 1; // unsp
-        uint32_t padding : 23; // reserved
+typedef union BSC0_STATUS {
+    struct {
+        uint8_t transfer_active: 1;
+        uint8_t done: 1;
+        uint8_t txw: 1;
+        uint8_t rxr: 1;
+        uint8_t txd: 1; // fifo can accept data
+        uint8_t rxd: 1; // fifo contains data 
+        uint8_t txe: 1; // fifo empty
+        uint8_t rxf: 1; // fifo full
+        uint8_t err: 1; // have error
+        uint8_t clkt: 1; // clock stretch timeout
+        uint32_t reserved: 22; // reserved
     };
     uint32_t as_int;
-} I2C_flags_t;
+} bsc0_status_t;
+
+typedef union BSC0_DLEN {
+    struct {
+        uint32_t reserved: 16; //reserved
+        uint32_t dlen: 16;
+    };
+    uint32_t as_int;
+} bsc0_dlen;
+
+// I2C Function Prototypes
 
 typedef union I2C_slave_control
 {
@@ -117,9 +137,20 @@ typedef union I2C_slave_control
 
         uint8_t INV_TXF: 1; //default to 0
 
-        uint8_t reserved: 17; //reserved
+        uint32_t reserved: 17; //reserved
     };
     uint32_t as_int;
 } I2C_slave_control_t;
 
+void i2c_init();
+void i2c_end();
+bsc0_status_t read_status();
+bsc0_control_t read_control();
+void wait_i2c_done();
+void i2c_clear_status();
+void i2c_read(char* buf, uint32_t len);
+void i2c_write(const char * buf, uint32_t len);
+void i2c_set_data_len(uint32_t len);
+void i2c_clear_fifo();
+void i2c_transfer_done();
 #endif
