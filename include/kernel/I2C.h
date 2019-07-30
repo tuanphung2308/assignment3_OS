@@ -34,7 +34,26 @@ enum
     I2C_SLAVE_DEBUG2 = (I2C_SLAVE_BASE + 0x3C), //SPI Debug Register 
 };
 
-typedef union I2C_flags
+typedef union I2C_master_control
+{
+    struct
+    {
+        uint8_t READ : 1; // read transfer. 0 = Write Packet Transfer. 1 = Read Packet Transfer. [0]
+        uint8_t reserved : 3; // reserved. [3:1]
+        uint8_t CLEAR : 0; // FIFO clear. 00 = No action. x1 = Clear FIFO. This is 2bits. [5:4]
+        uint8_t reserved : 1; // reserved. [6]
+        uint8_t ST : 1; // start transfer. 0 = No action. 1 = Start a new transfer. [7]
+        uint8_t INTD : 0; // 0 = Don t generate interrupts on DONE. 1 = Generate interrupt while DONE =1. [8]
+        uint8_t INTT : 0; // 0 = Don t generate interrupts on TXW condition. 1 = Generate interrupt while TXW = 1. [9] 
+        uint8_t INTR : 0; // 0 = Don t generate interrupts on RXR condition. 1 = Generate interrupt while RXR = 1. [10]
+        uint8_t reserved : 4; // reserved. [14:11]
+        uint8_t I2CEN : 1; // I2C enable. 0 = BSC controller is disabled, 1 = BSC controller is enabled. [15] 
+        uint16_t padding; // [31:16]
+    };
+    uint32_t as_int;
+} I2C_master_control_t;
+
+typedef union I2C_master_flags
 {
     struct
     {
@@ -50,33 +69,6 @@ typedef union I2C_flags
         uint32_t padding : 23; // reserved
     };
     uint32_t as_int;
-} I2C_flags_t;
-
-typedef union I2C_control
-{
-    struct
-    {
-        uint8_t I2C_enabled : 1; //ENABLE I2C
-        uint8_t sir_enabled : 1; //unsupported
-        uint8_t sir_low_power_mode : 1; //unsupported
-        uint8_t reserved : 4; // reserved
-        uint8_t loop_back_enabled : 1; // the modem outputs are also fed through to the modem inputs
-        uint8_t transmit_enabled : 1; //enable transmit. the UART is disabled in the middle of 
-        // transmission, it completes the current
-        // character before stopping
-        uint8_t receive_enabled : 1; // RECEIEVE enable.
-        uint8_t data_transmit_ready : 1; //unsupported
-        uint8_t request_to_send : 1; //Request to send. This bit is the 
-        //complement of the UART request to send
-        uint8_t out1 : 1; // unsupported
-        uint8_t out2 : 1; // unsupported
-        uint8_t rts_hardware_flow_control_enabled : 1; 
-        //Data is only requested when there is space in the receive FIFO for it to be received
-        uint8_t cts_hardware_flow_control_enabled : 1; //Data is only transmitted when the
-        //nUARTCTS signal is asserted
-        uint16_t padding;
-    };
-    uint32_t as_int;
-} I2C_control_t;
+} I2C_master_flags_t;
 
 #endif
