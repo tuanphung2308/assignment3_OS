@@ -89,34 +89,39 @@ void kernel_main(void)
     }
 
     char buf[]={0x00, 0x20, 0x19, 0x18, 0x06, 0x12, 0x08, 0x16};
+    char *str[]  ={"SUN", "MON", "TUES", "WED", "THUR", "FRI", "SAT"};
+    int pause = 0;
     while (1) {
-        i2c_write_byte_2(0x00);
- 
-        i2c_read_data_2((uint8_t *)buf, 8);
-        buf[0] = buf[0] & 0x7F; //sec
-        buf[1] = buf[1] & 0x7F; //min
-        buf[2] = buf[2] & 0x3F; //hour
-        buf[3] = buf[3] & 0x07; //day of the week
-        buf[4] = buf[4] & 0x3F; //day of the month
-        buf[5] = buf[5] & 0x1F; //month
-        
-        puts("The year is: ");
-        puts("20");        
-        puts(dectohex(buf[6]));
-        puts("/");
-        puts(dectohex(buf[5]));
-        puts("/");
-        puts(dectohex(buf[4]));
-        puts(" ");
-        puts(itoa(buf[2]));
-        puts(":");
-        puts(itoa(buf[1]));
-        puts(":");
-        puts(itoa(buf[0]));
-
-        for (int i = 0; i < 7; i ++) {
-            puts(itoa(buf[i]));
+        unsigned char input_char = uart_getc_without_waiting();
+        if (input_char == 'p') pause = 1;
+        if (input_char == 'r') pause = 0;
+        if (!pause) {
+            i2c_write_byte_2(0x00);
+    
+            i2c_read_data_2((uint8_t *)buf, 8);
+            buf[0] = buf[0] & 0x7F; //sec
+            buf[1] = buf[1] & 0x7F; //min
+            buf[2] = buf[2] & 0x3F; //hour
+            buf[3] = buf[3] & 0x07; //day of the week
+            buf[4] = buf[4] & 0x3F; //day of the month
+            buf[5] = buf[5] & 0x1F; //month
+            
+            puts(str[(unsigned char)buf[3]-1]);
+            puts(" ");
+            puts("20");        
+            puts(dectohex(buf[6]));
+            puts("/");
+            puts(dectohex(buf[5]));
+            puts("/");
+            puts(dectohex(buf[4]));
+            puts(" ");
+            puts(dectohex(buf[2]));
+            puts(":");
+            puts(dectohex(buf[1]));
+            puts(":");
+            puts(dectohex(buf[0]));
+            puts("\r\n");
         }
-        puts("\r\n");
     }
+    
 }

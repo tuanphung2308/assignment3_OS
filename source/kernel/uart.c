@@ -16,6 +16,19 @@ uart_flags_t read_flags(void)
     return flags;
 }
 
+unsigned char uart_getc_without_waiting(void)
+{
+    uart_flags_t flags;
+    flags = read_flags();
+    if (flags.receive_queue_empty) {
+        return 'a';
+    } else {
+        return mmio_read(UART0_DR);
+    }
+    // What does the condition in the while loop mean?
+    // Rx Fifo Empty Flag when the receive FIFO is full.
+}
+
 unsigned char uart_getc(void)
 {
     uart_flags_t flags;
