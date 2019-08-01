@@ -83,11 +83,27 @@ typedef union BSC0_STATUS {
 
 typedef union BSC0_DLEN {
     struct {
-        uint32_t reserved: 16; //reserved
         uint32_t dlen: 16;
+        uint32_t reserved: 16; //reserved
     };
     uint32_t as_int;
 } bsc0_dlen_t;
+
+typedef union BSC0_ADDRESS {
+    struct {
+        uint8_t addr: 7;
+        uint32_t reserved: 25; //reserved
+    };
+    uint32_t as_int;
+} bsc0_address_t;
+
+typedef union BSC0_FIF0 {
+    struct {
+        uint8_t data: 8;
+        uint32_t reserved: 24; //reserved
+    };
+    uint32_t as_int;
+} bsc0_fifo_t;
 
 // I2C Function Prototypes
 
@@ -148,9 +164,11 @@ bsc0_status_t read_status();
 bsc0_control_t read_control();
 void wait_i2c_done();
 void i2c_clear_status();
-void i2c_read(char* buf, uint32_t len);
+void i2c_read(uint8_t* data, uint32_t len);
 void i2c_write(const char * buf, uint32_t len);
 void i2c_set_data_len(uint32_t len);
 void i2c_clear_fifo();
 void i2c_transfer_done();
+void i2c_start();
+void i2c_write_byte(uint8_t byte);
 #endif

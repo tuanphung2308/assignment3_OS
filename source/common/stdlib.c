@@ -76,8 +76,8 @@ char* dectohex(int i)  {
         hexvalue[j-1] = 'F';
     }
     // Input x0
-    hexvalue[j++] = 'x';
-    hexvalue[j++] = '0';
+    // hexvalue[j++] = 'x';
+    // hexvalue[j++] = '0';
     hexvalue[j] = '\0';
     // Reverse
     j--;

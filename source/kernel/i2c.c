@@ -6,7 +6,16 @@
 void i2c_init() {
     //Init I2C master
     // Enable alternative function ALT0 for PIN00 and PIN01
-    mmio_write(GPFSEL, (1 << 8) | (1 << 11));
+    // mmio_write(GPFSEL, (1 << 8) | (1 << 11));
+    *(volatile uint32_t*) GPFSEL |= (0b100 << ((2 % 10) * 3));
+    *(volatile uint32_t*) GPFSEL |= (0b100 << ((3 % 10) * 3));
+}
+
+void i2c_start() {
+    bsc0_status_t status = read_status();
+    status.txd = 1;
+    status.txe = 1;
+    mmio_write(BSC0_C, status.as_int);
 }
 
 void i2c_end() {
@@ -46,70 +55,71 @@ void i2c_clear_status() {
     mmio_write(BSC0_C, status.as_int);
 }
 
-void i2c_read(char* buf, uint32_t len) {
-    //SLAVE ADDRESS
-    uint32_t SLAVE_ADDRESS = 0x68; //define slave address here
-    mmio_write(BSC0_A, SLAVE_ADDRESS);
-
-    bsc0_status_t status = read_status();
-
-    uint32_t remaining = len;
-	uint32_t i = 0;
-
-    //Clear FIFO
-    i2c_clear_fifo();
-    // bsc0_control_t control;
-    // control.CLEAR = 1; // Oneshot clear
-    // mmio_write(BSC0_C, control.as_int);
-    
-    // Clear status
-    i2c_clear_status();
-    // bsc0_status_t status = read_status();
-    // status.clkt = 1;
-    // status.err = 1;
-    // status.done = 1;
-    // mmio_write(BSC0_C, status.as_int);
-    
-    // Set data Length
-    i2c_set_data_len(len);
-    // bsc0_dlen_t dlength;
-    // dlength.dlen = len;
-    // mmio_write(BSC0_DLEN, dlength.as_int);
+void i2c_write_byte(uint8_t byte) {
+    i2c_set_data_len(1);
+    delay(150);
 
     bsc0_control_t control = read_control();
-    control.I2CEN = 1; // Enable I2C
-    control.ST = 1; // Start transfer
-    control.READ = 1; // Mode = read
+    control.READ = 1;
+    control.CLEAR = 1;
     mmio_write(BSC0_C, control.as_int);
-    // puts("Value of DONE status: ");
-    // puts(itoa(status.done));
-    // puts("\r\n");
+    delay(150);
+
+    bsc0_fifo_t fifo;
+    fifo.data = byte;
+    mmio_write(BSC0_FIFO, fifo.as_int);
+    delay(150);
+
+    bsc0_status_t status = read_status();
+    status.done = 1;
+    mmio_write(BSC0_S, status.as_int);
+    delay(150);
+
+    control.ST = 1;
+    mmio_write(BSC0_C, control.as_int);
 
     do {
         status = read_status();
-        if (status.rxd) {
-            while (status.rxd) {
-                puts("Value of RXD status: ");
-                puts(itoa(status.rxd));
-                puts("\r\n");
-                // If fifo contain data
-                buf[i] = mmio_read(BSC0_FIFO);
-                i++;
-                remaining--;
-            }
-        } else {
-            puts("FIFO not contain any data\r\n");
-        }
+        puts("STucking here: writing \r\n");
     } while (!(status.done));
+    
+    // status.done = 1;
+    // mmio_write(BSC0_S, status.as_int);
+    // delay(150);
+}
 
-    // Read anything left in FIFO
-    // do {
-    //     buf[i] = mmio_read(BSC0_FIFO);
-    //     i++;
-    //     remaining--;
-    //     status = read_status();
-    // } while (remaining && status.rxd); d
-    i2c_transfer_done();
+void i2c_read(uint8_t* data, uint32_t len) {
+	uint16_t i = 0;
+
+    i2c_set_data_len(len);
+    bsc0_control_t control = read_control();
+    control.READ = 1; // Mode = read
+    control.CLEAR = 1;
+    mmio_write(BSC0_C, control.as_int);
+    delay(150);
+
+    control.ST = 1;
+    mmio_write(BSC0_C, control.as_int);
+    delay(150);
+
+    bsc0_status_t status = read_status();
+    do {
+        status = read_status();
+        while (i < len && status.rxd) {
+            puts("FIFO Contains data\r\n");
+            data[i++] = mmio_read(BSC0_FIFO);
+        }
+        puts("While not done \r\n");
+    } while (!(status.done));
+    //remaning
+    while (i < len && status.rxd) {
+        data[i++] = mmio_read(BSC0_FIFO);
+        status = read_status();
+    }
+    
+    status.done = 1;
+    mmio_write(BSC0_S, status.as_int);
+    delay(150);
 }
 
 void i2c_write(const char * buf, uint32_t len) {

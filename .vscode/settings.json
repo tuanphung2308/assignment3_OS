@@ -2,6 +2,8 @@
     "files.associations": {
         "stdlib.h": "c",
         "gpio.h": "c",
-        "uart.h": "c"
+        "uart.h": "c",
+        "i2c.h": "c",
+        "stdio.h": "c"
     }
 }
