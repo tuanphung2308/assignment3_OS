@@ -11,7 +11,7 @@
 
 enum
 {
-    BSC0_BASE    = (0x3F205000),         // I2C Base address
+    BSC0_BASE    = (0x3F804000),         // I2C Base address
     BSC0_C       = (BSC0_BASE + 0x00),    // I2C Control 
     BSC0_S       = (BSC0_BASE + 0x04),    // I2C Status
     BSC0_DLEN    = (BSC0_BASE + 0x08),    // I2C Data Length
@@ -49,7 +49,7 @@ typedef union BSC0_CONTROL
         uint8_t CLEAR : 2; // FIFO clear. 00 = No action. x1 = Clear FIFO. This is 2bits. [5:4]
         // CLEAR should be 2 bits
 
-        uint8_t reserved : 1; // reserved. [6]
+        uint8_t reserved_2 : 1; // reserved. [6]
         uint8_t ST : 1; // start transfer. 0 = No action. 1 = Start a new transfer. [7]
         uint8_t INTD : 1; // 0 = Don t generate interrupts on DONE. 1 = Generate interrupt while DONE =1. [8]
         // should be 1 bit here
@@ -57,7 +57,7 @@ typedef union BSC0_CONTROL
         // should be 1 bit here
         uint8_t INTR : 1; // 0 = Don t generate interrupts on RXR condition. 1 = Generate interrupt while RXR = 1. [10]
         // 1 bit length here
-        uint8_t reserved : 4; // reserved. [14:11]
+        uint8_t reserved_3 : 4; // reserved. [14:11]
         uint8_t I2CEN : 1; // I2C enable. 0 = BSC controller is disabled, 1 = BSC controller is enabled. [15] 
         uint16_t padding: 16; // [31:16] // reserved again
     };
@@ -87,7 +87,7 @@ typedef union BSC0_DLEN {
         uint32_t dlen: 16;
     };
     uint32_t as_int;
-} bsc0_dlen;
+} bsc0_dlen_t;
 
 // I2C Function Prototypes
 

@@ -4,11 +4,9 @@
 #include <stdint.h>
 #include "../../include/common/stdlib.h"
 #include "../../include/common/stdio.h"
+#include "../../include/kernel/gpio.h"
 enum
 {
-    GPIO_BASE    = 0x3F200000,           // GPIO Base Address
-    GPPUD        = (GPIO_BASE + 0x94),   // GPIO Pin Pull Up/Down Enable
-    GPPUDCLK0    = (GPIO_BASE + 0x98),   // GPIO Pin Pull Up/Down Enable Clock 0
     UART0_BASE   = (GPIO_BASE + 0x1000), // UART Base Address
     UART0_DR     = (UART0_BASE + 0x00),  // Data Register
     UART0_RSRECR = (UART0_BASE + 0x04),  // Receive Status Register / Error Clear Register
