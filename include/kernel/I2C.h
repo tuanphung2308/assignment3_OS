@@ -12,10 +12,10 @@
 enum
 {
     BSC0_BASE    = (0x3F804000),         // I2C Base address
-    BSC0_C       = (BSC0_BASE + 0x00),    // I2C Control 
-    BSC0_S       = (BSC0_BASE + 0x04),    // I2C Status
-    BSC0_DLEN    = (BSC0_BASE + 0x08),    // I2C Data Length
-    BSC0_A       = (BSC0_BASE + 0x0c),    // I2C Slave Address 
+    BSC0_C       = (BSC0_BASE + 0x0),    // I2C Control 
+    BSC0_S       = (BSC0_BASE + 0x4),    // I2C Status
+    BSC0_DLEN    = (BSC0_BASE + 0x8),    // I2C Data Length
+    BSC0_A       = (BSC0_BASE + 0xc),    // I2C Slave Address 
     BSC0_FIFO    = (BSC0_BASE + 0x10),    // I2C Data FIFO 
     BSC0_DIV     = (BSC0_BASE + 0x14),    // I2C Clock Divider
     BSC0_DEL     = (BSC0_BASE + 0x18),    // I2C Data Delay
@@ -97,7 +97,7 @@ typedef union BSC0_ADDRESS {
     uint32_t as_int;
 } bsc0_address_t;
 
-typedef union BSC0_FIF0 {
+typedef union BSC0_FIFO {
     struct {
         uint8_t data: 8;
         uint32_t reserved: 24; //reserved

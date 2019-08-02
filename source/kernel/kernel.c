@@ -26,43 +26,86 @@ enum {
     I2C_S_TXD = 0x10,
     I2C_S_DONE = 0x02
 };
-
-void i2c_write_byte_2(uint8_t byte)
+void write_or(uint32_t reg, uint32_t data)
 {
-    I2C->DLEN = 1; // one byte transfer
-    I2C->C |= I2C_C_CLEAR; // clear fifo
-    I2C->C &= ~I2C_C_READ; // clear read bit -> write
+    *(volatile uint32_t*)reg |= data;
+}
 
-    I2C->FIFO = byte;
-    I2C->C |= I2C_C_ST; // start transfer
+void write_and(uint32_t reg, uint32_t data)
+{
+    *(volatile uint32_t*)reg &= data;
+}
+void i2c_write_byte_2(uint8_t byte)
+{                                   
+    mmio_write(BSC0_DLEN, 0x1);
+    // I2C->DLEN = 1; // one byte transfer
+    // I2C->C |= I2C_C_CLEAR; // clear fifo
+    write_or(BSC0_C, I2C_C_CLEAR);
 
-    while(!(I2C->S & I2C_S_DONE)); // wait for done
-    I2C->S |= I2C_S_DONE; // clear done flag
+    // I2C->C &= ~I2C_C_READ; // clear read bit -> write
+    write_and(BSC0_C, ~I2C_C_READ);
+
+    mmio_write(BSC0_FIFO, byte);
+    // I2C->FIFO = byte;
+    // bsc0_control_t controls = read_control();
+    // controls.ST = 1;
+    // mmio_write(BSC0_C, controls.as_int);
+    write_or(BSC0_C, I2C_C_ST);
+
+    // I2C->C |= I2C_C_ST; // start transfer
+    uint32_t done = mmio_read(BSC0_S) & 0x02;
+    do {
+        done = mmio_read(BSC0_S) & 0x02;
+    } while (!done);
+    // while(!(I2C->S & I2C_S_DONE)); // wait for done
+    write_or(BSC0_S, I2C_S_DONE);
+    // I2C->S |= I2C_S_DONE; // clear done flag
+}
+
+uint8_t extract_bit(uint32_t reg, uint16_t no) {
+    uint32_t data = mmio_read(reg);
+    return data >> no & 1;
 }
 
 void i2c_read_data_2(uint8_t *data, uint16_t length)
 {
     uint16_t i = 0;
 
-    I2C->DLEN = length;
-    I2C->C |= I2C_C_READ | I2C_C_CLEAR; // set read bit, clear FIFO
+    mmio_write(BSC0_DLEN, length);
 
-    I2C->C |= I2C_C_ST; // start transfer
+    write_or(BSC0_C, I2C_C_READ | I2C_C_CLEAR);
+    write_or(BSC0_C, I2C_C_ST);
+    //I2C->C |= I2C_C_READ | I2C_C_CLEAR; // set read bit, clear FIFO
+    //I2C->C |= I2C_C_ST; // start transfer
 
-    while(!(I2C->S & I2C_S_DONE)) { // while not done
-        while(i < length && I2C->S & I2C_S_RXS) { // while data left and fifo not empty
-            data[i++] = I2C->FIFO;
+    while(!(mmio_read(BSC0_S) & I2C_S_DONE)) { // while not done
+        while(i < length && (mmio_read(BSC0_S) & I2C_S_RXS)) { // while data left and fifo not empty
+            //data[i++] = I2C->FIFO;
+            //puts(dectohex(mmio_read(BSC0_S) & I2C_S_RXS));
+            // puts("\r\n");
+            data[i++] = mmio_read(BSC0_FIFO);
         }
     }
-    while(i < length && I2C->S & I2C_S_RXS) { // remaining data in fifo
-        data[i++] = I2C->FIFO;
+
+    while(i < length && (mmio_read(BSC0_S) & I2C_S_RXS)) { // remaining data in fifo
+        data[i++] = mmio_read(BSC0_FIFO);
+        // data[i++] = I2C->FIFO;
     }
-    I2C->S |= I2C_S_DONE; // clear done flag
+    write_or(BSC0_S, I2C_S_DONE);
 }
 
 void i2c_set_address(uint8_t addr)
 {
     I2C->A = addr & 0x7f; // only 7 bit
+}
+
+void i2c_write_address(uint8_t a) {
+    mmio_write(BSC0_A, a);
+}
+
+void delay_ms(uint32_t ms) {
+    for (uint32_t i = 0; i < ms; i ++) {
+    }
 }
 
 void kernel_main(void) 
@@ -72,9 +115,12 @@ void kernel_main(void)
 
     I2C = (volatile struct i2c_register_map *) BSC0_BASE;
 
-    i2c_set_address(0x68);
-    I2C->C |= I2C_C_I2CEN; // clear fifo, enable bsc controller
-    I2C->S = 0x50; // reset flag register
+    // i2c_set_address(0x68);
+    i2c_write_address(0x68);
+    write_or(BSC0_C, I2C_C_I2CEN);
+    // I2C->C |= I2C_C_I2CEN; // clear fifo, enable bsc controller
+    // I2C->S = 0x50; // reset flag register
+    mmio_write(BSC0_S, 0x50);
 
     char* print_list[] = {
         "EEET2490: Embedded Systems - Operating Systems & Interfacing\r\n",
@@ -122,6 +168,8 @@ void kernel_main(void)
             puts(dectohex(buf[0]));
             puts("\r\n");
         }
+        // delay_ms(50000000);
+        delay(5500000);
     }
     
 }
