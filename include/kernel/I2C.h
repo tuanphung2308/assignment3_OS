@@ -46,7 +46,8 @@ typedef union BSC0_CONTROL
     {
         uint8_t READ : 1; // read transfer. 0 = Write Packet Transfer. 1 = Read Packet Transfer. [0]
         uint8_t reserved : 3; // reserved. [3:1]
-        uint8_t CLEAR : 2; // FIFO clear. 00 = No action. x1 = Clear FIFO. This is 2bits. [5:4]
+        uint8_t CLEAR_1 : 1;
+        uint8_t CLEAR_2 : 1; // FIFO clear. 00 = No action. x1 = Clear FIFO. This is 2bits. [5:4]
         // CLEAR should be 2 bits
 
         uint8_t reserved_2 : 1; // reserved. [6]
@@ -159,16 +160,9 @@ typedef union I2C_slave_control
 } I2C_slave_control_t;
 
 void i2c_init();
-void i2c_end();
 bsc0_status_t read_status();
 bsc0_control_t read_control();
-void wait_i2c_done();
-void i2c_clear_status();
-void i2c_read(uint8_t* data, uint32_t len);
-void i2c_write(const char * buf, uint32_t len);
-void i2c_set_data_len(uint32_t len);
-void i2c_clear_fifo();
-void i2c_transfer_done();
 void i2c_start();
 void i2c_write_byte(uint8_t byte);
+void i2c_write_address(uint8_t a);
 #endif

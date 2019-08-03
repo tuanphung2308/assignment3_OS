@@ -83,6 +83,9 @@ char*       dectohex(int i)  {
         }
         // Input x0
         // hexvalue[j++] = 'x';
+        // if (j == 0) {
+        //     hexvalue[j++] = '0';
+        // }
         // hexvalue[j++] = '0';
         hexvalue[j] = '\0';
         // Reverse

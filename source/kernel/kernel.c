@@ -35,37 +35,6 @@ void write_and(uint32_t reg, uint32_t data)
 {
     *(volatile uint32_t*)reg &= data;
 }
-void i2c_write_byte_2(uint8_t byte)
-{                                   
-    mmio_write(BSC0_DLEN, 0x1);
-    // I2C->DLEN = 1; // one byte transfer
-    // I2C->C |= I2C_C_CLEAR; // clear fifo
-    bsc0_control_t controls = read_control();
-    // controls.CLEAR = 3;
-    mmio_write(BSC0_C, controls.as_int); //OK
-    // write_or(BSC0_C, I2C_C_CLEAR);
-
-    // I2C->C &= ~I2C_C_READ; // clear read bit -> write
-    controls.READ = 0; //OK 
-    mmio_write(BSC0_C, controls.as_int); //OK
-    // write_and(BSC0_C, ~I2C_C_READ);
-
-    mmio_write(BSC0_FIFO, byte);
-    // I2C->FIFO = byte;
-    // bsc0_control_t controls = read_control();
-    // controls.ST = 1;
-    // mmio_write(BSC0_C, controls.as_int);
-    write_or(BSC0_C, I2C_C_ST);
-
-    // I2C->C |= I2C_C_ST; // start transfer
-    uint32_t done = mmio_read(BSC0_S) & 0x02;
-    do {
-        done = mmio_read(BSC0_S) & 0x02;
-    } while (!done);
-    // while(!(I2C->S & I2C_S_DONE)); // wait for done
-    write_or(BSC0_S, I2C_S_DONE);
-    // I2C->S |= I2C_S_DONE; // clear done flag
-}
 
 void i2c_read_data_2(uint8_t *data, uint16_t length)
 {
@@ -73,8 +42,16 @@ void i2c_read_data_2(uint8_t *data, uint16_t length)
 
     mmio_write(BSC0_DLEN, length);
 
-    write_or(BSC0_C, I2C_C_READ | I2C_C_CLEAR);
-    write_or(BSC0_C, I2C_C_ST);
+    bsc0_control_t controls = read_control();
+    bsc0_status_t status = read_status();
+    controls.CLEAR_1 = 1;
+    controls.READ = 1;
+    mmio_write(BSC0_C, controls.as_int);
+    // write_or(BSC0_C, I2C_C_READ | I2C_C_CLEAR);
+    // controls = read_control();
+    controls.ST = 1;
+    mmio_write(BSC0_C, controls.as_int);
+    // write_or(BSC0_C, I2C_C_ST);
     //I2C->C |= I2C_C_READ | I2C_C_CLEAR; // set read bit, clear FIFO
     //I2C->C |= I2C_C_ST; // start transfer
 
@@ -91,16 +68,9 @@ void i2c_read_data_2(uint8_t *data, uint16_t length)
         data[i++] = mmio_read(BSC0_FIFO);
         // data[i++] = I2C->FIFO;
     }
-    write_or(BSC0_S, I2C_S_DONE);
-}
-
-void i2c_set_address(uint8_t addr)
-{
-    I2C->A = addr & 0x7f; // only 7 bit
-}
-
-void i2c_write_address(uint8_t a) {
-    mmio_write(BSC0_A, a);
+    status = read_status();
+    status.done = 1;
+    mmio_write(BSC0_S, status.as_int);
 }
 
 void delay_ms(uint32_t ms) {
@@ -115,7 +85,6 @@ void kernel_main(void)
 
     I2C = (volatile struct i2c_register_map *) BSC0_BASE;
 
-    // i2c_set_address(0x68);
     i2c_write_address(0x68);
     
     bsc0_control_t controls;
@@ -124,9 +93,6 @@ void kernel_main(void)
     controls.I2CEN = 1;
     mmio_write(BSC0_C, controls.as_int);
 
-    // write_or(BSC0_C, I2C_C_I2CEN);
-    // I2C->C |= I2C_C_I2CEN; // clear fifo, enable bsc controller
-    // I2C->S = 0x50; // reset flag register
     mmio_write(BSC0_S, 0x50);
 
     char* print_list[] = {
@@ -142,14 +108,22 @@ void kernel_main(void)
     }
 
     char buf[]={0x00, 0x20, 0x19, 0x18, 0x06, 0x12, 0x08, 0x16};
-    char *str[]  ={"SUN", "MON", "TUES", "WED", "THUR", "FRI", "SAT"};
+    char *str[]  ={
+        "Sunday",
+        "Monday", 
+        "Tuesday", 
+        "Wednesday", 
+        "Thursday", 
+        "Friday", 
+        "Saturday"
+    };
     int pause = 0;
     while (1) {
         unsigned char input_char = uart_getc_without_waiting();
         if (input_char == 'p') pause = 1;
         if (input_char == 'r') pause = 0;
         if (!pause) {
-            i2c_write_byte_2(0x00);
+            i2c_write_byte(0x00);
     
             i2c_read_data_2((uint8_t *)buf, 8);
             buf[0] = buf[0] & 0x7F; //sec
