@@ -40,10 +40,15 @@ void i2c_write_byte_2(uint8_t byte)
     mmio_write(BSC0_DLEN, 0x1);
     // I2C->DLEN = 1; // one byte transfer
     // I2C->C |= I2C_C_CLEAR; // clear fifo
-    write_or(BSC0_C, I2C_C_CLEAR);
+    bsc0_control_t controls = read_control();
+    // controls.CLEAR = 3;
+    mmio_write(BSC0_C, controls.as_int); //OK
+    // write_or(BSC0_C, I2C_C_CLEAR);
 
     // I2C->C &= ~I2C_C_READ; // clear read bit -> write
-    write_and(BSC0_C, ~I2C_C_READ);
+    controls.READ = 0; //OK 
+    mmio_write(BSC0_C, controls.as_int); //OK
+    // write_and(BSC0_C, ~I2C_C_READ);
 
     mmio_write(BSC0_FIFO, byte);
     // I2C->FIFO = byte;
@@ -60,11 +65,6 @@ void i2c_write_byte_2(uint8_t byte)
     // while(!(I2C->S & I2C_S_DONE)); // wait for done
     write_or(BSC0_S, I2C_S_DONE);
     // I2C->S |= I2C_S_DONE; // clear done flag
-}
-
-uint8_t extract_bit(uint32_t reg, uint16_t no) {
-    uint32_t data = mmio_read(reg);
-    return data >> no & 1;
 }
 
 void i2c_read_data_2(uint8_t *data, uint16_t length)
@@ -117,7 +117,14 @@ void kernel_main(void)
 
     // i2c_set_address(0x68);
     i2c_write_address(0x68);
-    write_or(BSC0_C, I2C_C_I2CEN);
+    
+    bsc0_control_t controls;
+    bzero(&controls, 4);
+    controls.as_int = mmio_read(BSC0_C);
+    controls.I2CEN = 1;
+    mmio_write(BSC0_C, controls.as_int);
+
+    // write_or(BSC0_C, I2C_C_I2CEN);
     // I2C->C |= I2C_C_I2CEN; // clear fifo, enable bsc controller
     // I2C->S = 0x50; // reset flag register
     mmio_write(BSC0_S, 0x50);

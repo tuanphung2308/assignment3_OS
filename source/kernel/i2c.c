@@ -31,6 +31,7 @@ bsc0_status_t read_status() {
 
 bsc0_control_t read_control() {
     bsc0_control_t controls;
+    bzero(&controls, 4);
     controls.as_int = mmio_read(BSC0_C);
     return controls;
 }
