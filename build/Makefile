@@ -29,13 +29,6 @@ clean:
 	@rm $(OBJS_DIR)/*.elf
 	@echo Removing $(ELFILE)
 
-	# @echo Removing Object Files $(wildcard $(OBJS_DIR)/*.o)
-	# @del $(OBJS_DIR)\*.o
-	# @echo Removing $(OBJS_DIR)/$(ELFILE)
-	# @del $(OBJS_DIR)\$(ELFILE)
-	# @echo Removing $(OBJS_DIR)/$(TARGET)
-	# @del $(OBJS_DIR)\$(TARGET)
-
 run:
 	@echo Mounting image to QEMU  
 	qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel $(OBJS_DIR)/myos.elf

@@ -158,11 +158,24 @@ typedef union I2C_slave_control
     };
     uint32_t as_int;
 } I2C_slave_control_t;
-
+enum {I2C_FIFO_SIZE = 16};
+enum {
+    I2C_C_I2CEN = 0x8000,
+    I2C_C_ST = 0x80,
+    I2C_C_CLEAR = 0x10,
+    I2C_C_READ = 0x01
+};
+enum {
+    I2C_S_RXS = 0x20,
+    I2C_S_TXD = 0x10,
+    I2C_S_DONE = 0x02
+};
 void i2c_init();
 bsc0_status_t read_status();
 bsc0_control_t read_control();
 void i2c_start();
 void i2c_write_byte(uint8_t byte);
 void i2c_write_address(uint8_t a);
+void i2c_read_data(uint8_t *data, uint16_t length);
+void i2c_enable();
 #endif

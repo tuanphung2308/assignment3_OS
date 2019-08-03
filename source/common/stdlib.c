@@ -83,7 +83,7 @@ char*       dectohex(int i)  {
         }
         // Input x0
         // hexvalue[j++] = 'x';
-        // if (j == 0) {
+        // if (j == 1)
         //     hexvalue[j++] = '0';
         // }
         // hexvalue[j++] = '0';
@@ -99,7 +99,6 @@ char*       dectohex(int i)  {
             i++;
         }
     }
-    
     return hexvalue;  
 }
 
