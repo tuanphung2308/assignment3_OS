@@ -100,3 +100,11 @@ void i2c_read_data(uint8_t *data, uint16_t length)
     status.done = 1;
     mmio_write(BSC0_S, status.as_int);
 }
+
+void start_tx() {
+    bsc0_status_t status;
+    status = read_status();
+    status.txd = 1; //fifo can accpet data
+    status.txe = 1; // fifo empty
+    mmio_write(BSC0_S, status.as_int);
+}

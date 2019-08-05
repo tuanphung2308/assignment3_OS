@@ -178,4 +178,5 @@ void i2c_write_byte(uint8_t byte);
 void i2c_write_address(uint8_t a);
 void i2c_read_data(uint8_t *data, uint16_t length);
 void i2c_enable();
+void start_tx() ;
 #endif
