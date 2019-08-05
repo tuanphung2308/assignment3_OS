@@ -19,9 +19,12 @@ void kernel_main(void)
 		"Assessment Group: 6\r\n",
 		"s3761489: Tuan Phung\r\n",
 		"s3695340: Sung Jin Kim\r\n",
-		"s3567923: Dang Phuc Hung\r\n"
+		"s3567923: Dang Phuc Hung\r\n",
+        "\r\n",
+        "DS1307 Real Time Clock Data\r\n",
+        "---------------------------\r\n"
     };
-    for (int i = 0; i < 6; i ++) {
+    for (int i = 0; i < 9; i ++) {
         puts(print_list[i]);
     }
 

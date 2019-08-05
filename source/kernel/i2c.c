@@ -6,9 +6,6 @@
 void i2c_init() {
     //Init I2C master
     // Enable alternative function ALT0 for PIN00 and PIN01
-    // uint32_t fsel_data = mmio_read(GPFSEL);
-    // fsel_data |= ((0b100 << 6) | (0b100 << 9));
-    // mmio_write(GPFSEL, fsel_data);
     *(volatile uint32_t*) GPFSEL |= (0b100 << 6);
     *(volatile uint32_t*) GPFSEL |= (0b100 << 9);
 }
@@ -84,14 +81,19 @@ void i2c_read_data(uint8_t *data, uint16_t length)
     controls.ST = 1;
     mmio_write(BSC0_C, controls.as_int);
 
-    while(!(mmio_read(BSC0_S) & I2C_S_DONE)) { // while not done
-        while(i < length && (mmio_read(BSC0_S) & I2C_S_RXS)) { // while data left and fifo not empty
+    
+    status = read_status();
+    while(!status.done) { // while not done
+        while(i < length && status.rxd) { // while data left and fifo not empty
             data[i++] = mmio_read(BSC0_FIFO);
+            status = read_status();
         }
+        status = read_status();
     }
 
-    while(i < length && (mmio_read(BSC0_S) & I2C_S_RXS)) { // remaining data in fifo
+    while(i < length && status.rxd) { // remaining data in fifo
         data[i++] = mmio_read(BSC0_FIFO);
+        status = read_status();
     }
 
     status = read_status();
