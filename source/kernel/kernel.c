@@ -7,12 +7,11 @@ void kernel_main(void)
 	uart_init();
     i2c_init();
 
-    i2c_write_address(0x68);
+    i2c_set_slave(0x68);
     
     i2c_enable();
 
     start_tx();
-    //mmio_write(BSC0_S, 0x50);
 
     char* print_list[] = {
         "EEET2490: Embedded Systems - Operating Systems & Interfacing\r\n",
