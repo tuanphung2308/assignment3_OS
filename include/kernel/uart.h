@@ -72,9 +72,6 @@ typedef union uart_control
     };
     uint32_t as_int;
 } uart_control_t;
-
-void mmio_write(uint32_t reg, uint32_t data);
-uint32_t mmio_read(uint32_t reg);
 uart_flags_t read_flags(void);
 unsigned char uart_getc(void);
 unsigned char uart_getc_without_waiting(void);

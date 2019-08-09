@@ -2,6 +2,8 @@
 #define __I2CHEADER__
 #include <stddef.h>
 #include <stdint.h>
+#include "../../include/common/stdlib.h"
+#include "../../include/kernel/uart.h"
 
 enum
 {

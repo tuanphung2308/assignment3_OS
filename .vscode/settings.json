@@ -4,6 +4,7 @@
         "gpio.h": "c",
         "uart.h": "c",
         "i2c.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "stdint.h": "c"
     }
 }

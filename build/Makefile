@@ -33,9 +33,6 @@ run:
 	@echo Mounting image to QEMU  
 	qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel $(OBJS_DIR)/myos.elf
 
-# run: $(OBJS_DIR)/$(ELFILE)
-# 	@$(EM_DIR)/$(EM) $(EMFLAGS)
-
 .PHONY: clean all run
 
 $(OBJS_DIR)/%.o : $(SRC_KER_DIR)/%.s 
@@ -50,11 +47,7 @@ $(OBJS_DIR)/%.o : $(SRC_KER_DIR)/%.c $(INC_KER_DIR)/%.h
 	@echo Compiling C Source File $< 
 	@$(CC_DIR)/$(CC) $(CFLAGS) -I$(INC_CMN_DIR) -I$(INC_KER_DIR) -c $< -o $@ $(CSRCFLAGS)
 
-$(OBJS_DIR)/%.o : $(SRC_KER_DIR)/%.c
-	@echo Compiling C Source File $< 
-	@$(CC_DIR)/$(CC) $(CFLAGS) -I$(INC_CMN_DIR) -I$(INC_KER_DIR) -c $< -o $@ $(CSRCFLAGS) 
-
-$(OBJS_DIR)/$(ELFILE) : $(OBJS_DIR)/boot.o $(OBJS_DIR)/kernel.o $(OBJS_DIR)/stdlib.o $(OBJS_DIR)/stdio.o $(OBJS_DIR)/uart.o $(OBJS_DIR)/i2c.o
+$(OBJS_DIR)/$(ELFILE) : $(OBJS_DIR)/boot.o $(OBJS_DIR)/kernel.o $(OBJS_DIR)/stdlib.o $(OBJS_DIR)/stdio.o $(OBJS_DIR)/uart.o $(OBJS_DIR)/i2c.o $(OBJS_DIR)/gpio.o $(OBJS_DIR)/spi.o
 	@echo Linking Objects Files: $^
 	@$(CC_DIR)/$(CC) -T linker.ld -o $(OBJS_DIR)/$(ELFILE) $(LFLAGS) $^ 
 	@echo Extensible Linkable Format File: $@ created 

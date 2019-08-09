@@ -1,13 +1,12 @@
-#include "../../include/kernel/i2c.h"
-// #include "gpio.h"
+#include <stddef.h>
+#include <stdint.h>
 #include "../../include/kernel/gpio.h"
-#include "../../include/common/stdlib.h"
-#include "../../include/kernel/uart.h"
+#include "../../include/kernel/i2c.h"
 void i2c_init() {
     //Init I2C master
     // Enable alternative function ALT0 for PIN00 and PIN01
-    *(volatile uint32_t*) GPFSEL |= (0b100 << 6);
-    *(volatile uint32_t*) GPFSEL |= (0b100 << 9);
+    *(volatile uint32_t*) GPFSEL0     |= (0b100 << 6);
+    *(volatile uint32_t*) GPFSEL0 |= (0b100 << 9);
 }
 
 void i2c_enable() {
