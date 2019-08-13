@@ -1,4 +1,5 @@
 #include "spi.h"
+
 void spi0_init() {
     for (int i = 8; i < 12; i++) fsel_alt0(i); // set pin from 8-11 to ALT0
     // Subject to change
@@ -16,7 +17,7 @@ void spi0_start_transfer(void) {
     mmio_write(SPI0_CS, control.as_int);
 }
 
-void spi_transfer_stop(void)
+void spi0_transfer_stop(void)
 {
     spi0_cs_t control = read_cs();
     while(!(control.done)) {
@@ -26,7 +27,7 @@ void spi_transfer_stop(void)
     mmio_write(SPI0_CS, control.as_int);
 }
 
-uint8_t spi_transfer_byte(uint8_t data)
+uint8_t spi0_transfer_byte(uint8_t data)
 {
     spi0_cs_t control = read_cs();
     control.clear = 3;
