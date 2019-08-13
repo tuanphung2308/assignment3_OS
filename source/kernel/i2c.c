@@ -5,7 +5,7 @@
 void i2c_init() {
     //Init I2C master
     // Enable alternative function ALT0 for PIN00 and PIN01
-    *(volatile uint32_t*) GPFSEL0     |= (0b100 << 6);
+    *(volatile uint32_t*) GPFSEL0 |= (0b100 << 6);
     *(volatile uint32_t*) GPFSEL0 |= (0b100 << 9);
 }
 
