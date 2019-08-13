@@ -31,9 +31,9 @@ uint8_t spi_transfer_byte(uint8_t data)
     spi0_cs_t control = read_cs();
     control.clear = 3;
     mmio_write(SPI0_FIFO, data);
-    do {
-        control = read_cs();
-    } while (!control.rxd);
+        do {
+            control = read_cs();
+        } while (!control.rxd);
     return (uint8_t) mmio_read(SPI0_FIFO);
 }
 

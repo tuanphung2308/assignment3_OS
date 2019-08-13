@@ -122,3 +122,17 @@ uint32_t mmio_read(uint32_t reg)
 {
     return *(volatile uint32_t*)reg;
 }
+
+const char* get_week_day(int day) {
+    switch (day){
+        case :
+            break;
+        case :
+            break;
+        case :
+            break;
+        case :
+            break;
+        case
+    }
+}

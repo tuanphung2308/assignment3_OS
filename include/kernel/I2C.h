@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "../../include/common/stdlib.h"
 #include "../../include/kernel/uart.h"
+enum {I2C_FIFO_SIZE = 16};
 
 enum
 {
@@ -95,4 +96,5 @@ void i2c_set_slave(uint8_t a);
 void i2c_read_data(uint8_t *data, uint16_t length);
 void i2c_enable();
 void start_tx() ;
+void i2c_write_data(const uint8_t *data, uint16_t length);
 #endif

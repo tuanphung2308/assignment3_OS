@@ -42,6 +42,38 @@ void i2c_set_slave(uint8_t a) {
     mmio_write(BSC1_A, a);
 }
 
+void i2c_write_data(const uint8_t *data, uint16_t length) {
+    uint16_t i;
+
+    mmio_write(BSC1_DLEN, length);
+    bsc1_control_t controls = read_control();
+    bsc1_status_t status = read_status();
+    controls.CLEAR_1 = 1;
+    mmio_write(BSC1_C, controls.as_int);
+
+    // fill fifo before starting transfer
+    for (i = 0; i < length && i < I2C_FIFO_SIZE; ++i) {
+        mmio_write(BSC1_FIFO, data[i]);
+    }
+
+    //start transfer
+    controls = read_control();
+    controls.ST = 1;
+    mmio_write(BSC1_C, controls.as_int);
+    do {
+        mmio_write(BSC1_FIFO, data[i++]);
+        status = read_status();
+    } while (i < length && status.txd);
+
+    do {
+        status = read_status();
+    } while(!(status.done & 0x01));
+
+    // status = read_status();
+    status.done = 1;
+    mmio_write(BSC1_S, status.as_int);
+}
+
 void i2c_write_byte(uint8_t byte)
 {                                   
     mmio_write(BSC1_DLEN, 0x1);

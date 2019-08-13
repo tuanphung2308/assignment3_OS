@@ -21,4 +21,13 @@ void kernel_main(void)
     for (int i = 0; i < 9; i ++) {
         puts(print_list[i]);
     }
+    while (1) {
+        spi0_start_transfer();
+        uint8_t ret = spi_transfer_byte(0x8);
+        puts("Value is: ");
+        puts(dectohex(ret));
+        puts("\r\n");
+        delay(500000);
+        spi_transfer_stop();
+    }
 }

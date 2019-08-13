@@ -8,4 +8,5 @@ void bzero(void* dest, int bytes); // Zeros out a segment of 'bytes' in memory
 void delay(uint32_t count);
 void mmio_write(uint32_t reg, uint32_t data);
 uint32_t mmio_read(uint32_t reg);
+char* get_week_day(int value);
 #endif
