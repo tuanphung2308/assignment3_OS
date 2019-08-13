@@ -43,3 +43,7 @@ spi0_cs_t read_cs() {
     control.as_int = mmio_read(SPI0_CS);
     return control;
 }
+
+void spi0_divisor(uint32_t divisor){
+    mmio_write(SPI0_CLK, divisor);
+}
