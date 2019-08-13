@@ -125,14 +125,21 @@ uint32_t mmio_read(uint32_t reg)
 
 const char* get_week_day(int day) {
     switch (day){
-        case :
-            break;
-        case :
-            break;
-        case :
-            break;
-        case :
-            break;
-        case
+        case Sunday:
+            return "Sunday";
+        case Monday:
+            return "Monday";
+        case Tuesday:
+            return "Tuesday";
+        case Wednesday:
+            return "Wednesday";
+        case Thursday:
+            return "Thursday";
+        case Friday:
+            return "Friday";
+        case Saturday:
+            return "Saturday";
+        default:
+            return "ERR";
     }
 }

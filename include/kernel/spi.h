@@ -5,7 +5,6 @@
 #include "gpio.h"
 #include "../../include/common/stdlib.h"
 #include "../../include/kernel/uart.h"
-
 enum
 {
     SPI0_BASE = (0x3F204000),         
@@ -15,6 +14,7 @@ enum
     SPI0_DLEN = (SPI0_BASE + 0xc),   
     SPI0_LTOH = (SPI0_BASE + 0x10),    
     SPI0_DC = (SPI0_BASE + 0x14), 
+    SPI_CS_CE0 = 0x0,
 };
 
 typedef union SPI0_CS
@@ -23,7 +23,7 @@ typedef union SPI0_CS
     {
         uint8_t chip_select: 2; //Chip select -> select 0 here
         uint8_t clock_phase : 1; // read transfer. 0 = Write Packet Transfer. 1 = Read Packet Transfer. [0]
-        uint8_t clock_polarity : 3;
+        uint8_t clock_polarity : 1;
         uint8_t clear : 2;
         uint8_t cspol : 1;
         uint8_t transfer_active : 1;
@@ -53,9 +53,11 @@ typedef union SPI0_CS
 // SPI Function Prototypes
 spi0_cs_t read_cs(void);
 void spi0_init(void);
-void spi0_start_transfer(void);
-void spi0_transfer_stop(void);
-void spi0_chip_select(uint8_t chip_no);
-uint8_t spi0_transfer_byte(uint8_t data);
 
+void spi_configure();
+void spi_set_ce(uint8_t ce);
+
+void     spi_transfer_start(void);
+void     spi_transfer_stop(void);
+uint8_t  spi_transfer_byte(uint8_t data);
 #endif

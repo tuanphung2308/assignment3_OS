@@ -24,6 +24,14 @@ void i2c_start() {
     mmio_write(BSC1_C, status.as_int);
 }
 
+void i2c_stop(void)
+{
+    bsc1_control_t controls;
+    controls.as_int = mmio_read(BSC1_C);
+    controls.I2CEN = 0;
+    mmio_write(BSC1_C, controls.as_int);
+}
+
 bsc1_status_t read_status() {
     bsc1_status_t status;
     // bzero(&status, 4);
@@ -42,7 +50,7 @@ void i2c_set_slave(uint8_t a) {
     mmio_write(BSC1_A, a);
 }
 
-void i2c_write_data(const uint8_t *data, uint16_t length) {
+void i2c_write_data(uint8_t *data, uint16_t length) {
     uint16_t i;
 
     mmio_write(BSC1_DLEN, length);
@@ -138,4 +146,10 @@ void start_tx() {
     status.txd = 1; //fifo can accpet data
     status.txe = 1; // fifo empty
     mmio_write(BSC1_S, status.as_int);
+}
+
+void i2c_write_register(uint8_t reg, uint8_t data)
+{
+    uint8_t packet[2] = {reg, data};
+    i2c_write_data(packet, 2);
 }
