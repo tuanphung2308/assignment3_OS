@@ -4,6 +4,7 @@
 
 enum day
 {
+    NaN,
     Sunday,
     Monday,
     Tuesday, 
