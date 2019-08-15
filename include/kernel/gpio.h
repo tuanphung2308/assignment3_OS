@@ -11,4 +11,6 @@ enum
     GPPUDCLK0    = (GPIO_BASE + 0x98),   // GPIO Pin Pull Up/Down Enable Clock 0
 };
 void fsel_alt0(int pin_no);
+void i2c_init();
+void spi0_init();
 #endif

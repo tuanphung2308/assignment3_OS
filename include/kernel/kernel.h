@@ -4,6 +4,7 @@
 #include "../../include/kernel/uart.h"
 #include "../../include/kernel/spi.h"
 #include "../../include/kernel/i2c.h"
+#include "../../include/kernel/gpio.h"
 #include "../../include/common/ds1307.h"
 void kernel_main(void);
 #endif

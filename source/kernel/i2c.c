@@ -2,12 +2,6 @@
 #include <stdint.h>
 #include "../../include/kernel/gpio.h"
 #include "../../include/kernel/i2c.h"
-void i2c_init() {
-    //Init I2C master
-    // Enable alternative function ALT0 for PIN00 and PIN01
-    *(volatile uint32_t*) GPFSEL0 |= (0b100 << 6);
-    *(volatile uint32_t*) GPFSEL0 |= (0b100 << 9);
-}
 
 void i2c_enable() {
     bsc1_control_t controls;
@@ -48,38 +42,6 @@ bsc1_control_t read_control() {
 
 void i2c_set_slave(uint8_t a) {
     mmio_write(BSC1_A, a);
-}
-
-void i2c_write_data(uint8_t *data, uint16_t length) {
-    uint16_t i;
-
-    mmio_write(BSC1_DLEN, length);
-    bsc1_control_t controls = read_control();
-    bsc1_status_t status = read_status();
-    controls.CLEAR_1 = 1;
-    mmio_write(BSC1_C, controls.as_int);
-
-    // fill fifo before starting transfer
-    for (i = 0; i < length && i < I2C_FIFO_SIZE; ++i) {
-        mmio_write(BSC1_FIFO, data[i]);
-    }
-
-    //start transfer
-    controls = read_control();
-    controls.ST = 1;
-    mmio_write(BSC1_C, controls.as_int);
-    do {
-        mmio_write(BSC1_FIFO, data[i++]);
-        status = read_status();
-    } while (i < length && status.txd);
-
-    do {
-        status = read_status();
-    } while(!(status.done & 0x01));
-
-    // status = read_status();
-    status.done = 1;
-    mmio_write(BSC1_S, status.as_int);
 }
 
 void i2c_write_byte(uint8_t byte)
@@ -147,30 +109,3 @@ void start_tx() {
     status.txe = 1; // fifo empty
     mmio_write(BSC1_S, status.as_int);
 }
-
-void i2c_write_register(uint8_t reg, uint8_t data)
-{
-    uint8_t packet[2] = {reg, data};
-    i2c_write_data(packet, 2);
-}
-
-
-// void set_time(uint8_t sec, uint8_t min, uint8_t hour, uint8_t day, uint8_t date, uint8_t month, uint8_t year, uint8_t mode) {
-//     // uint8_t time_stop[]={
-//     //     0x00, 
-//     //     0x80
-//     // };
-//     // i2c_write_data(time_stop, 2);
-//     uint8_t time[]={
-//         0x00, 
-//         decToBcd(sec), 
-//         decToBcd(min), 
-//         format_hour(hour, mode), 
-//         decToBcd(day), 
-//         decToBcd(date), 
-//         decToBcd(month), 
-//         decToBcd(year)
-//     };
-//     i2c_write_data(time, 8);
-//     // delay(100000);
-// }

@@ -55,36 +55,38 @@ void print_time(uint8_t buf[]) {
     print_format(buf[0]);
 }
 
-void set_time(uint8_t sec, uint8_t min, uint8_t hr, uint8_t hr_mode, uint8_t day, uint8_t date, uint8_t month, uint8_t year){
-    //clear fifo before transaction
-    bsc1_control_t control;
-    bzero(&control,4);        //zero-out the control register
-    mmio_write(BSC1_C, control.as_int);
+void set_time(uint8_t sec, uint8_t min, uint8_t hr, uint8_t rtc_mode, uint8_t day, uint8_t date, uint8_t month, uint8_t year){
+    // CLEAR FIFO x.x
+    bsc1_control_t control = read_control();
     control.CLEAR_1 = 1;   
     mmio_write(BSC1_C, control.as_int);
-    //register address of tiny has 1 byte
-    mmio_write(BSC1_DLEN, 0x08);
-    //1st byte: reg address of RTC
+    // DLEN = 8 Bit
+    mmio_write(BSC1_DLEN, 8);
 
-    mmio_write(BSC1_FIFO, 0);
+    mmio_write(BSC1_FIFO, 0x00);
     mmio_write(BSC1_FIFO, decToBcd(sec));
     mmio_write(BSC1_FIFO, decToBcd(min));
-    mmio_write(BSC1_FIFO, format_hour(hr ,hr_mode));
+    mmio_write(BSC1_FIFO, format_hour(hr ,rtc_mode));
     mmio_write(BSC1_FIFO, decToBcd(day));
     mmio_write(BSC1_FIFO, decToBcd(date));
     mmio_write(BSC1_FIFO, decToBcd(month));
     mmio_write(BSC1_FIFO, decToBcd(year));
 
-    bzero(&control, 4);
+    //Start Writing and send everythign within 1 packet
+    control = read_control();
     control.I2CEN = 1;
     control.READ = 0;
     control.ST = 1;
     mmio_write(BSC1_C, control.as_int);
+
 
     bsc1_status_t status;
     do {
         status = read_status();
     } while (!(status.done));
     
-    mmio_write(BSC1_S, (1 << 1));
+    //Clear status
+    status = read_status();
+    status.done = 1;
+    mmio_write(BSC1_S, status.as_int);
 }

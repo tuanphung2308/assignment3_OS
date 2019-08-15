@@ -51,10 +51,6 @@ uint8_t spi_transfer_byte(uint8_t data)
     return (uint8_t) mmio_read(SPI0_FIFO);
 }
 
-void spi0_init() {
-    for (int i = 8; i < 12; i++) fsel_alt0(i); // set pin from 8-11 to ALT0
-}
-
 spi0_cs_t read_cs() {
     spi0_cs_t control;
     control.as_int = mmio_read(SPI0_CS);

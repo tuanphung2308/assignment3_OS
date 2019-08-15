@@ -96,7 +96,7 @@ void kernel_main(void)
                 }
                 puts("\r\n");
                 current_sec = buf[0];
-                delay(5579728);
+                // delay(5579728); // dont need this one
             }
         }
     }

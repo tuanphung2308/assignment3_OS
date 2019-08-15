@@ -96,8 +96,6 @@ void i2c_set_slave(uint8_t a);
 void i2c_read_data(uint8_t *data, uint16_t length);
 void i2c_enable();
 void start_tx() ;
-void i2c_write_data(uint8_t *data, uint16_t length);
-void i2c_write_register(uint8_t reg, uint8_t data);
 void i2c_stop(void);
 // void set_time(uint8_t sec, uint8_t min, uint8_t hour, uint8_t day, uint8_t date, uint8_t month, uint8_t year, uint8_t mode);
 #endif

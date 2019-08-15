@@ -7,6 +7,7 @@
         "stdio.h": "c",
         "stdint.h": "c",
         "kernel.h": "c",
-        "rtc_time.h": "c"
+        "rtc_time.h": "c",
+        "ds1307.h": "c"
     }
 }
