@@ -123,6 +123,18 @@ uint32_t mmio_read(uint32_t reg)
     return *(volatile uint32_t*)reg;
 }
 
+uint8_t get_bit(uint8_t data, int position) {
+    return (data >> position) &  1;
+}
+
+uint8_t bcdToDec(uint8_t val){
+    return (val / 16 * 10) + (val % 16);
+}
+
+uint8_t decToBcd(uint8_t val) {
+    return (val / 10 * 16) + (val % 10);
+}
+
 const char* get_week_day(int day) {
     switch (day){
         case Sunday:

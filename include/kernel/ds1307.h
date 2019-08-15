@@ -1,6 +1,7 @@
 #ifndef __RTCTIME__
 #define __RTCTIME__
 #include "i2c.h"
+#include "stdlib.h"
 #include <stddef.h>
 #include <stdint.h>
 enum {
@@ -13,9 +14,6 @@ enum {
     PM
 };
 
-uint8_t get_bit(uint8_t data, int position);
-uint8_t bcdToDec(uint8_t val);
-uint8_t decToBcd(uint8_t val);
 void print_format(uint8_t val);
 uint8_t format_hour (uint8_t value, int hour_mode);
 void print_time(uint8_t buf[]);

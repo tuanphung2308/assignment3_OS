@@ -21,4 +21,7 @@ void delay(uint32_t count);
 void mmio_write(uint32_t reg, uint32_t data);
 uint32_t mmio_read(uint32_t reg);
 const char* get_week_day(int value);
+uint8_t get_bit(uint8_t data, int position);
+uint8_t bcdToDec(uint8_t val);
+uint8_t decToBcd(uint8_t val);
 #endif

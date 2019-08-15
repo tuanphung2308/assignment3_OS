@@ -1,15 +1,4 @@
 #include "ds1307.h"
-uint8_t get_bit(uint8_t data, int position) {
-    return (data >> position) &  1;
-}
-
-uint8_t bcdToDec(uint8_t val){
-    return (val / 16 * 10) + (val % 16);
-}
-
-uint8_t decToBcd(uint8_t val) {
-    return (val / 10 * 16) + (val % 10);
-}
 
 void print_format(uint8_t val) {
     if (val < 10) puts("0");
