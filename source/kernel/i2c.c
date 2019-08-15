@@ -153,3 +153,24 @@ void i2c_write_register(uint8_t reg, uint8_t data)
     uint8_t packet[2] = {reg, data};
     i2c_write_data(packet, 2);
 }
+
+
+// void set_time(uint8_t sec, uint8_t min, uint8_t hour, uint8_t day, uint8_t date, uint8_t month, uint8_t year, uint8_t mode) {
+//     // uint8_t time_stop[]={
+//     //     0x00, 
+//     //     0x80
+//     // };
+//     // i2c_write_data(time_stop, 2);
+//     uint8_t time[]={
+//         0x00, 
+//         decToBcd(sec), 
+//         decToBcd(min), 
+//         format_hour(hour, mode), 
+//         decToBcd(day), 
+//         decToBcd(date), 
+//         decToBcd(month), 
+//         decToBcd(year)
+//     };
+//     i2c_write_data(time, 8);
+//     // delay(100000);
+// }

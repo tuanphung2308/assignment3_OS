@@ -5,6 +5,8 @@
         "uart.h": "c",
         "i2c.h": "c",
         "stdio.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "kernel.h": "c",
+        "rtc_time.h": "c"
     }
 }
