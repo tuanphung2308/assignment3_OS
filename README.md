@@ -8,6 +8,3 @@ make clean
 make all
 qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel myos.elf
 ```
-
-I2C + RTC + Rasp PI 3B
-Easy :) 
